@@ -39,6 +39,6 @@ public class HelloWorld implements Job {
   @Bean
   public CronTriggerFactoryBean triggerHelloWorldJob(
       @Qualifier("helloWorldBeanJob") JobDetail jobDetail) {
-    return QuartzConfig.createCronTrigger(jobDetail, "0 * * ? * * *", "trigger Hello World job!");
+    return QuartzConfig.createCronTrigger(jobDetail, "0/15 * * ? * * *", "trigger Hello World job!");
   }
 }

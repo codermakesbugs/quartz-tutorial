@@ -16,13 +16,20 @@ public class Main {
 
       SimpleTrigger simpleTrigger =
           TriggerBuilder.newTrigger()
-              .withIdentity("Hello-World-trigger-name")
+              .withIdentity("Hello-World-trigger-name SimpleTrigger")
               .forJob(jobDetail)
               .withSchedule(
                   SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(5).repeatForever())
               .build();
 
-      scheduler.scheduleJob(jobDetail, simpleTrigger);
+      CronTrigger cronTrigger =
+          TriggerBuilder.newTrigger()
+              .withIdentity("Hello-World-trigger-name CronTrigger")
+              .forJob(jobDetail)
+              .withSchedule(CronScheduleBuilder.cronSchedule("0/15 * * ? * * *"))
+              .build();
+      //      scheduler.scheduleJob(jobDetail, simpleTrigger);
+      scheduler.scheduleJob(jobDetail, cronTrigger);
       scheduler.start();
 
     } catch (SchedulerException e) {
