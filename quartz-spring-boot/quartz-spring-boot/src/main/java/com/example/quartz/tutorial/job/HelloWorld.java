@@ -1,10 +1,7 @@
 package com.example.quartz.tutorial.job;
 
 import com.example.quartz.tutorial.configure.QuartzConfig;
-import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
-import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,7 +21,15 @@ public class HelloWorld implements Job {
         "Job ** {} ** starting @ {}",
         context.getJobDetail().getKey().getName(),
         context.getFireTime());
-    System.out.println("Hello World job!");
+
+    JobKey key = context.getJobDetail().getKey();
+
+    JobDataMap dataMap = context.getJobDetail().getJobDataMap();
+
+    System.out.printf(
+        "Hello World job key: %s - text: %s - number: %s !\n",
+        key.getName(), dataMap.get("text"), dataMap.get("number"));
+
     LOGGER.info(
         "Job ** {} ** completed.  Next job scheduled @ {}",
         context.getJobDetail().getKey().getName(),
@@ -33,12 +38,31 @@ public class HelloWorld implements Job {
 
   @Bean
   public JobDetailFactoryBean helloWorldBeanJob() {
-    return QuartzConfig.createJobDetail(HelloWorld.class, "Hello World!");
+    LOGGER.debug(
+        "createJobDetail(jobClass={}, jobName={})", HelloWorld.class.getName(), "Hello World!");
+
+    JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
+    factoryBean.setName("Hello World!");
+    factoryBean.setJobClass(HelloWorld.class);
+
+    JobDataMap jobDataMap = new JobDataMap();
+    jobDataMap.put("text", "develop");
+    jobDataMap.put("number", 6969);
+    factoryBean.setJobDataMap(jobDataMap);
+
+    factoryBean.setDurability(true);
+
+    return factoryBean;
   }
 
   @Bean
   public CronTriggerFactoryBean triggerHelloWorldJob(
       @Qualifier("helloWorldBeanJob") JobDetail jobDetail) {
-    return QuartzConfig.createCronTrigger(jobDetail, "0/15 * * ? * * *", "trigger Hello World job!");
+    CronTriggerFactoryBean factoryBean = new CronTriggerFactoryBean();
+    factoryBean.setJobDetail(jobDetail);
+    factoryBean.setCronExpression("0/15 * * ? * * *");
+    factoryBean.setName("triggerHelloWorld");
+
+    return factoryBean;
   }
 }

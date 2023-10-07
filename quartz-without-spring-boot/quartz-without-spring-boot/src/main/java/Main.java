@@ -4,32 +4,39 @@ import org.quartz.impl.StdSchedulerFactory;
 public class Main {
   public static void main(String[] args) {
     try {
-      StdSchedulerFactory factory = new StdSchedulerFactory();
-      Scheduler scheduler = factory.getScheduler();
+      Scheduler scheduler = new StdSchedulerFactory().getScheduler();
 
-      JobDetail jobDetail =
+      JobDetail jobDetailSimple =
           JobBuilder.newJob()
               .ofType(HelloWorld.class)
-              .withIdentity("Hello-World-job-name")
-              .withDescription("My Job!")
+              .withIdentity("Hello-World-job-name 1")
+              .withDescription("My Job 1!")
+              .build();
+
+      JobDetail jobDetailCron =
+          JobBuilder.newJob()
+              .ofType(HelloWorld.class)
+              .withIdentity("Hello-World-job-name 2")
+              .withDescription("My Job 2!")
               .build();
 
       SimpleTrigger simpleTrigger =
           TriggerBuilder.newTrigger()
               .withIdentity("Hello-World-trigger-name SimpleTrigger")
-              .forJob(jobDetail)
+              .forJob(jobDetailSimple)
               .withSchedule(
-                  SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(5).repeatForever())
+                  SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(15).repeatForever())
               .build();
 
       CronTrigger cronTrigger =
           TriggerBuilder.newTrigger()
               .withIdentity("Hello-World-trigger-name CronTrigger")
-              .forJob(jobDetail)
-              .withSchedule(CronScheduleBuilder.cronSchedule("0/15 * * ? * * *"))
+              .forJob(jobDetailCron)
+              .withSchedule(CronScheduleBuilder.cronSchedule("0/30 * * ? * * *"))
               .build();
-      //      scheduler.scheduleJob(jobDetail, simpleTrigger);
-      scheduler.scheduleJob(jobDetail, cronTrigger);
+
+      scheduler.scheduleJob(jobDetailSimple, simpleTrigger);
+      scheduler.scheduleJob(jobDetailCron, cronTrigger);
       scheduler.start();
 
     } catch (SchedulerException e) {
