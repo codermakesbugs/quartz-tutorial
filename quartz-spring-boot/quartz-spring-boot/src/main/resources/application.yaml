@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    jdbcUrl: "jdbc:postgresql://localhost:5432/postgres?currentSchema=quartz"
+    username: "postgres"
+    password: "postgres"
+  quartz:
+    job-store-type: jdbc
+    properties:
+      org:
+        quartz:
+          jobStore:
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
