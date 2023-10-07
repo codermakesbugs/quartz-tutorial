@@ -31,14 +31,14 @@ public class HelloWorld implements Job {
         context.getNextFireTime());
   }
 
-    @Bean
-    public JobDetailFactoryBean helloWorldBeanJob() {
-        return QuartzConfig.createJobDetail(HelloWorld.class, "Hello World!");
-    }
+  @Bean
+  public JobDetailFactoryBean helloWorldBeanJob() {
+    return QuartzConfig.createJobDetail(HelloWorld.class, "Hello World!");
+  }
 
-    @Bean
-    public CronTriggerFactoryBean triggerHelloWorldJob(
-            @Qualifier("helloWorldBeanJob") JobDetail jobDetail) {
-        return QuartzConfig.createCronTrigger(jobDetail, "0 * * ? * * *", "trigger Hello World job!");
-    }
+  @Bean
+  public CronTriggerFactoryBean triggerHelloWorldJob(
+      @Qualifier("helloWorldBeanJob") JobDetail jobDetail) {
+    return QuartzConfig.createCronTrigger(jobDetail, "0 * * ? * * *", "trigger Hello World job!");
+  }
 }

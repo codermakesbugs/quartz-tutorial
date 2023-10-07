@@ -26,56 +26,56 @@ import javax.sql.DataSource;
 @Configuration
 @EnableAutoConfiguration
 public class QuartzConfig extends SpringBeanJobFactory implements ApplicationContextAware {
-    private static final Logger LOGGER = LoggerFactory.getLogger(QuartzConfig.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(QuartzConfig.class);
 
-    private transient AutowireCapableBeanFactory beanFactory;
+  private transient AutowireCapableBeanFactory beanFactory;
 
-    @Override
-    public void setApplicationContext(final ApplicationContext context) {
-        beanFactory = context.getAutowireCapableBeanFactory();
-    }
+  @Override
+  public void setApplicationContext(final ApplicationContext context) {
+    beanFactory = context.getAutowireCapableBeanFactory();
+  }
 
-    @Override
-    protected Object createJobInstance(final TriggerFiredBundle bundle) throws Exception {
-        final Object job = super.createJobInstance(bundle);
-        beanFactory.autowireBean(job);
-        return job;
-    }
+  @Override
+  protected Object createJobInstance(final TriggerFiredBundle bundle) throws Exception {
+    final Object job = super.createJobInstance(bundle);
+    beanFactory.autowireBean(job);
+    return job;
+  }
 
-    @Bean
-    @QuartzDataSource
-    @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource quartzDataSource() {
-        return DataSourceBuilder.create().build();
-    }
+  @Bean
+  @QuartzDataSource
+  @ConfigurationProperties(prefix = "spring.datasource")
+  public DataSource quartzDataSource() {
+    return DataSourceBuilder.create().build();
+  }
 
-    public static CronTriggerFactoryBean createCronTrigger(
-            JobDetail jobDetail, String cronExpression, String triggerName) {
-        // To fix an issue with time-based cron jobs
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
+  public static CronTriggerFactoryBean createCronTrigger(
+      JobDetail jobDetail, String cronExpression, String triggerName) {
+    // To fix an issue with time-based cron jobs
+    Calendar calendar = Calendar.getInstance();
+    calendar.set(Calendar.SECOND, 0);
+    calendar.set(Calendar.MILLISECOND, 0);
 
-        CronTriggerFactoryBean factoryBean = new CronTriggerFactoryBean();
-        factoryBean.setJobDetail(jobDetail);
-        factoryBean.setCronExpression(cronExpression);
-        factoryBean.setStartTime(calendar.getTime());
-        factoryBean.setStartDelay(0L);
-        factoryBean.setName(triggerName);
-        factoryBean.setMisfireInstruction(CronTrigger.MISFIRE_INSTRUCTION_DO_NOTHING);
+    CronTriggerFactoryBean factoryBean = new CronTriggerFactoryBean();
+    factoryBean.setJobDetail(jobDetail);
+    factoryBean.setCronExpression(cronExpression);
+    factoryBean.setStartTime(calendar.getTime());
+    factoryBean.setStartDelay(0L);
+    factoryBean.setName(triggerName);
+    factoryBean.setMisfireInstruction(CronTrigger.MISFIRE_INSTRUCTION_DO_NOTHING);
 
-        return factoryBean;
-    }
+    return factoryBean;
+  }
 
-    public static JobDetailFactoryBean createJobDetail(
-            Class<? extends Job> jobClass, String jobName) {
-        LOGGER.debug("createJobDetail(jobClass={}, jobName={})", jobClass.getName(), jobName);
+  public static JobDetailFactoryBean createJobDetail(
+      Class<? extends Job> jobClass, String jobName) {
+    LOGGER.debug("createJobDetail(jobClass={}, jobName={})", jobClass.getName(), jobName);
 
-        JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
-        factoryBean.setName(jobName);
-        factoryBean.setJobClass(jobClass);
-        factoryBean.setDurability(true);
+    JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
+    factoryBean.setName(jobName);
+    factoryBean.setJobClass(jobClass);
+    factoryBean.setDurability(true);
 
-        return factoryBean;
-    }
+    return factoryBean;
+  }
 }
